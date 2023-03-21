@@ -85,7 +85,7 @@ minio:
   region:
   pvc:
     storage: 1Gi
-    storageclass: gp3-csi
+    storageClass: gp3-csi
   argocd:
     syncwave: "-2"
 
