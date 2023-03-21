@@ -1,0 +1,22 @@
+{{- if .Values.minio.enabled -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "minio.name" . }}-pvc
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+  annotations: 
+    {{- if .Values.argocd.enabled }}
+    {{- include "minio.argocd-syncwave" . | nindent 4 }}
+    {{- else }}
+    "helm.sh/hook": pre-install  
+    {{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.minio.pvc.storage }}
+  storageClassName: {{ .Values.minio.pvc.storageClass }}
+  volumeMode: Filesystem
+{{- end }}

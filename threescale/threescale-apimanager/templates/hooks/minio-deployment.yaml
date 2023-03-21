@@ -1,0 +1,52 @@
+{{- if .Values.minio.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "minio.name" . }}
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+  annotations: 
+    {{- if .Values.argocd.enabled }}
+    {{- include "minio.argocd-syncwave" . | nindent 4 }}
+    {{- else }}
+    "helm.sh/hook": pre-install  
+    {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "minio.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "minio.selectorLabels" . | nindent 8 }}
+    spec:
+      # Refer to the PVC created earlier
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            # Name of the PVC created earlier
+            claimName: {{ include "minio.name" . }}-pvc
+      containers:
+        - name: minio
+          # Pulls the default Minio image from Docker Hub
+          image: {{ .Values.minio.image }}
+          args:
+            - server
+            - /storage
+          env:
+          # Minio access key and secret key
+            - name: MINIO_ACCESS_KEY
+              value: {{ .Values.minio.accessKey }}
+            - name: MINIO_SECRET_KEY
+              value: {{ .Values.minio.secretKey }}
+            - name: MINIO_REGION_NAME
+              value: {{ .Values.minio.region }}
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: storage # must match the volume name, above
+              mountPath: "/storage"
+{{- end }}
