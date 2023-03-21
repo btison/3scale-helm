@@ -92,5 +92,14 @@ minio:
 s3Auth:
   enabled: true
 
+smtp:
+  host: ""
+  authentication: ""
+  domain: ""
+  sslVerify: ""
+  password: ""
+  port: "0"
+  userId: ""
+
 argocd:
   enabled: true
