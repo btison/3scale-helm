@@ -89,5 +89,8 @@ minio:
   argocd:
     syncwave: "-2"
 
+s3Auth:
+  enabled: true
+
 argocd:
   enabled: true

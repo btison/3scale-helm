@@ -62,7 +62,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Expand the name of the chart.
+Minio name.
 */}}
 {{- define "minio.name" -}}
 {{- default "minio" .Values.minio.nameOverride | trunc 63 | trimSuffix "-" }}
@@ -100,5 +100,43 @@ argocd.argoproj.io/sync-wave: "{{ .Values.minio.argocd.syncwave }}"
 {{- end }}
 {{- else }}
 {{- "{}" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Name of the s3-auth secret.
+*/}}
+{{- define "s3-auth.name" -}}
+{{- default "s3-auth" .Values.s3Auth.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/* 
+s3-auth secret.
+*/}}
+{{- define "s3-auth.secret" -}}
+{{- if .Values.minio.enabled }}
+{{- $hostname := printf "%s-%s.%s:80" (include "minio.name" . ) .Release.Namespace (include "openshift.subdomain" .) }}
+data:
+  AWS_ACCESS_KEY_ID: {{ .Values.minio.accessKey | b64enc }}
+  AWS_SECRET_ACCESS_KEY: {{ .Values.minio.secretKey | b64enc }}
+  AWS_BUCKET: {{ "3scale-bucket" | b64enc }}
+  AWS_REGION: {{ .Values.minio.region | b64enc }}
+  AWS_HOSTNAME: {{ $hostname | b64enc }}
+  AWS_PATH_STYLE: {{ "true" | b64enc }}
+  AWS_PROTOCOL: {{ "HTTP" | b64enc }}
+{{- end }}
+{{- end }}
+
+{{/* 
+OpenShift Subdomain
+*/}}
+{{- define "openshift.subdomain" -}}
+{{- if .Values.global.openshift.subdomain }}
+{{- .Values.global.openshift.subdomain }}
+{{- else }}
+{{- $ingresscontroller := (lookup "operator.openshift.io/v1" "IngressController" "openshift-ingress-operator" "default") | default dict }}
+{{- $status := (get $ingresscontroller "status") | default dict }}
+{{- $domain := (get $status "domain") | default dict }}
+{{- $domain }}
 {{- end }}
 {{- end }}
