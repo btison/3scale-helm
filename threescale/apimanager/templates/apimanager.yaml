@@ -1,0 +1,19 @@
+apiVersion: apps.3scale.net/v1alpha1
+kind: APIManager
+metadata:
+  name: {{ include "apimanager.name" . }}
+  labels:
+    {{- include "apimanager.labels" . | nindent 4 }}
+spec:
+  tenantName: {{ .Values.system.tenantName }}
+  wildcardDomain: "{{ include "openshift.subdomain" . }}"
+  resourceRequirementsEnabled: false
+  system:
+  {{- if .Values.s3Auth.enabled }}
+    fileStorage:
+      simpleStorageService:
+        configurationSecretRef:
+          name: {{ include "s3-auth.name" . }}
+  {{- end }}
+    database:
+      postgresql: {}
