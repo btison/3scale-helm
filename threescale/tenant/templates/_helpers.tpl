@@ -120,7 +120,7 @@ tenant secret
 {{- $secretData := (get $secretObj "data") | default dict }}
 {{- $adminPassword := "" }}
 {{- if .Values.tenant.adminPassword }}
-{{- $adminPassword = .Values.system.adminPassword }}
+{{- $adminPassword = .Values.tenant.adminPassword }}
 {{- else }}
 {{- $adminPassword = (get $secretData "admin_password") | default (randAlpha 8 | b64enc) }}
 {{- end }}
