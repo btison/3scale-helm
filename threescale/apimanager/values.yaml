@@ -101,5 +101,16 @@ smtp:
   port: "0"
   userId: ""
 
+system:
+  adminAccessToken:
+  adminPassword:
+  masterAccessToken:
+  masterPassword:
+  adminEmail: admin@email.com
+  adminUserId: admin
+  masterDomain: 3scale-master
+  masterUserId: master
+  tenantName: 3scale
+
 argocd:
   enabled: true

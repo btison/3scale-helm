@@ -128,6 +128,48 @@ data:
 {{- end }}
 
 {{/* 
+system-seed secret
+*/}}
+{{- define "system-seed.secret" -}}
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "system-seed") | default dict }}
+{{- $secretData := (get $secretObj "data") | default dict }}
+{{- $adminAccessToken := "" }}
+{{- if .Values.system.adminAccessToken }}
+{{- $adminAccessToken = .Values.system.adminAccessToken }}
+{{- else }}
+{{- $adminAccessToken = (get $secretData "ADMIN_ACCESS_TOKEN") | default (randAlpha 16 | b64enc) }}
+{{- end }}
+{{- $adminPassword := "" }}
+{{- if .Values.system.adminPassword }}
+{{- $adminPassword = .Values.system.adminPassword }}
+{{- else }}
+{{- $adminPassword = (get $secretData "ADMIN_PASSWORD") | default (randAlpha 8 | b64enc) }}
+{{- end }}
+{{- $masterAccessToken := "" }}
+{{- if .Values.system.masterAccessToken }}
+{{- $masterAccessToken = .Values.system.masterAccessToken }}
+{{- else }}
+{{- $masterAccessToken := (get $secretData "MASTER_ACCESS_TOKEN") | default (randAlpha 8 | b64enc) }}
+{{- end }}
+{{- $masterPassword := "" }}
+{{- if .Values.system.masterPassword }}
+{{- $masterPassword = .Values.system.masterPassword }}
+{{- else }}
+{{- $masterPassword = (get $secretData "MASTER_PASSWORD") | default (randAlpha 8 | b64enc) }}
+{{- end }}
+data:
+  ADMIN_ACCESS_TOKEN: {{ $adminAccessToken }}
+  ADMIN_EMAIL: {{ .Values.system.adminEmail | b64enc }}
+  ADMIN_PASSWORD: {{ $adminPassword }}
+  ADMIN_USER: {{ .Values.system.adminUserId | b64enc }}
+  MASTER_ACCESS_TOKEN: {{ $masterAccessToken }}
+  MASTER_DOMAIN: {{ .Values.system.masterDomain | b64enc }}
+  MASTER_PASSWORD: {{ $masterPassword }}
+  MASTER_USER: {{ .Values.system.masterUserId | b64enc }}
+  TENANT_NAME: {{ .Values.system.tenantName | b64enc }}
+{{- end }}
+
+{{/* 
 OpenShift Subdomain
 */}}
 {{- define "openshift.subdomain" -}}
