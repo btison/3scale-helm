@@ -13,6 +13,6 @@ spec:
     name: "{{ .Values.tenant.organizationName }}-admin-secret"
   systemMasterUrl: "{{ include "system.master-url" . }}"
   tenantSecretRef:
-    name: "{{ .Values.tenant.organizationName }}-admin-secret"
+    name: "{{ .Values.tenant.organizationName }}-tenant-secret"
     namespace: "{{ .Release.Namespace  }}"
   username: "{{ include "tenant.adminId" . }}"
