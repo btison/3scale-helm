@@ -101,14 +101,16 @@ OpenShift Subdomain
 OpenShift Subdomain
 */}}
 {{- define "system.master-url" -}}
+{{- $masterDomain := "" }}
 {{- if .Values.system.masterDomain }}
-{{- printf "%s.%s" .Values.system.masterDomain (include "openshift.subdomain" .) }}
+{{- $masterDomain = .Values.system.masterDomain }}
 {{- else }}
 {{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "system-seed") | default dict }}
 {{- $secretData := (get $secretObj "data") | default dict }}
-{{- $masterDomain = (get $secretData "MASTER_DOMAIN") | default ("3scale-master" | b64enc) }}
-{{- $masterDomain | b64dec }}
+{{- $masterDomainEnc := (get $secretData "MASTER_DOMAIN") | default ("3scale-master" | b64enc) }}
+{{- $masterDomain = $masterDomainEnc | b64dec }}
 {{- end }}
+{{- printf "https://%s.%s" .Values.system.masterDomain (include "openshift.subdomain" .) }}
 {{- end }}
 
 {{/* 
