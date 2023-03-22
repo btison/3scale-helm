@@ -1,0 +1,8 @@
+tenant:
+  adminId:
+  adminPassword:
+  email:
+  organizationName:
+
+system:
+  masterDomain:  
